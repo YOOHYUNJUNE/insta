@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .models import Post
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
 
 def index(request):
     posts = Post.objects.all().order_by('-id')
@@ -60,14 +62,25 @@ def like(request, post_id):
 
     return redirect('posts:index')
 
+def like_async(request, post_id):
+    # context = {
+    #     'message': post_id,
+    # }
+    user = request.user
+    post = Post.objects.get(id=post_id)
+    
+    if user in post.like_users.all(): # 이미 좋아요
+        post.like_users.remove(user)
+        status = False
+    else:   # 아직 좋아요X
+        post.like_users.add(user)
+        status = True
+    context = {
+        'status': status,
+        'count': len(post.like_users.all())
+    }
+    return JsonResponse(context)
 
 
 
 
-
-
-
-
-    post.like_users.add(user)
-
-    return redirect('posts:index')

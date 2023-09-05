@@ -1,0 +1,152 @@
+JS 기능 추가
+
+
+source venv/Scripts/activate
+python manage.py migrate
+python manage.py runserver
+
+@ posts/templates/index.html
+
+{% endfor %}
+
+    <script>
+      const likeButtons = document.querySelectorAll('i.heart')
+      console.log(likeButtons)
+
+    </script>
+
+{% endblock %}
+
+
+@ _card.html
+{% if post in user.like_posts.all %}
+      <i class="bi bi-heart-fill heart" style="color: red" data-post-id="{{post.id}}"></i>
+      {% else %}
+      <i class="bi bi-heart heart" data-post-id="{{post.id}}"></i>
+      {% endif %}
+
+@ index.html
+<script>
+      const likeButtons = document.querySelectorAll('i.heart')
+      // console.log(likeButtons)
+      likeButtons.forEach((likeButton) => {
+        // console.log(likeButton)
+        likeButton.addEventListener('click', (event) => {
+          let postId = event.target.dataset.postId
+          // console.log(postId)
+
+          likeRequest(event.target, postId)
+        })
+      })
+
+      let likeRequest = (button, postId) => {
+        console.log(button, postId)
+        // django 서버에 요청을 보냄
+        let likeURL = `/posts/${postId}/like-async/`
+        let response = fetch(likeURL)
+
+## django에서 경로 인식하지 못함
+@ urls.py
+    path('<int:post_id>/like-async/', views.like_async, name='like_async'),
+
+@ views.py
+def like_async(request, post_id):
+    context = {
+        'message': post_id,
+    }
+    return JsonResponse(context)
+
+@ index.html
+let likeRequest = async (button, postId) => {
+        console.log(button, postId)
+        // django 서버에 요청을 보냄
+        let likeURL = `/posts/${postId}/like-async/`
+        let response = await fetch(likeURL)
+        let result = await response.json()
+        console.log(result)
+
+@ views.py
+def like_async(request, post_id):
+    # context = {
+    #     'message': post_id,
+    # }
+    user = request.user
+    post = Post.objects.get(id=post_id)
+    
+    if user in post.like_users.all(): # 이미 좋아요
+        post.like_users.remove(user)
+        status = False
+    else:   # 아직 좋아요X
+        post.like_users.add(user)
+        status = True
+    context = {
+        'status': status,
+    }
+    return JsonResponse(context)
+
+@ index.html
+   // django 서버의 응답에 따라 좋아요 버튼을 수정
+        if (result.status) { // true : 좋아요 눌림
+          button.classList.remove('bi-heart')
+          button.classList.add('bi-heart-fill')
+          button.style.color = 'red'
+        } else { // false : 좋아요 취소
+          button.classList.remove('bi-heart-fill')
+          button.classList.add('bi-heart')
+          button.style.color = 'black'
+        }
+
+@ _card.html
+{% if post in user.like_posts.all %}
+      <i class="bi bi-heart-fill heart" style="color: red" data-post-id="{{post.id}}">{{post.like_users.all|length}}</i>
+      {% else %}
+      <i class="bi bi-heart heart" data-post-id="{{post.id}}">{{post.like_users.all|length}}</i>
+      {% endif %}
+      명이 선택했습니다!
+
+@ views.py
+context = {
+        'status': status,
+        'count': len(post.like_users.all())
+    }
+
+@ index.html
+if (result.status) { // true : 좋아요 눌림
+          button.classList.remove('bi-heart')
+          button.classList.add('bi-heart-fill')
+          button.style.color = 'red'
+
+          button.innerHTML = result.count
+
+        } else { // false : 좋아요 취소
+          button.classList.remove('bi-heart-fill')
+          button.classList.add('bi-heart')
+          button.style.color = 'black'
+
+          button.innerHTML = result.count
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
