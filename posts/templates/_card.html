@@ -1,16 +1,22 @@
 {% load bootstrap5 %}
 
+
 <div class="card mt-4">
   <div class="card-header">
     <p>
-      <img src="{{post.user.profile_image.url}}" alt="" class="rounded-circle" width="50px">
+      <a href="{% url 'accounts:profile' username=post.user %}">
+        <img src="{{post.user.profile_image.url}}" alt="" class="rounded-circle" width="50px">
+      </a>
       <a href="{% url 'accounts:profile' username=post.user %}" class="text-reset text-decoration-none">{{post.user}}</a>
     </p>
   </div>
 
-  <img src="{{post.image.url}}" alt="...">
+  <div class="card-body" style="display: flex; align-items: center; justify-content: space-between;">
+    <img src="{{post.image.url}}" alt="..." style="width: 600px; height: 600px; object-fit: cover;">
 
-  <div class="card-body">
+
+    <div class="card-body">
+      
       {% if post in user.like_posts.all %}
       <i class="bi bi-heart-fill heart" style="color: red" data-post-id="{{post.id}}">{{post.like_users.all|length}}</i>
       {% else %}
@@ -18,26 +24,29 @@
       {% endif %}
       명이 선택했습니다!
 
-    <p class="card-text">{{post.content}}</p>
-    <p class="card-text">{{post.created_at|timesince}}</p>
-  </div>
-  <div class="card-footer">
-    {% if user.is_authenticated %}
+      <p class="card-text">{{post.content}}</p>
+      <p class="card-text">{{post.created_at|timesince}}</p>
+      
+      {% if user.is_authenticated %}
+      <form action="{% url 'posts:comment_create' post_id=post.id %}" method="POST">
+        {% csrf_token %}
+        
+        {% bootstrap_form comment_form %}
+        <input type="submit" value="확인">
+      </form>
 
-    <form action="{% url 'posts:comment_create' post_id=post.id %}" method="POST">
-      {% csrf_token %}
-      {% bootstrap_form comment_form %}
-      <input type="submit">
-    </form>
+      <hr>
+      
 
-    <hr>
-    {% endif %}
+      {% endif %}
 
-    {% for comment in post.comment_set.all %}
-      <li>{{comment.user}} : {{comment.content}}</li>
-    {% endfor %}
-
-
-  </div>
-
+      {% for comment in post.comment_set.all|dictsortreversed:"created_at" %}
+        <li>
+            {{comment.user}} : {{comment.content}}
+          <a href="{% url 'posts:comment_delete' post_id=post.id comment_id=comment.id %}" style="color:blue;">삭제</a>
+    
+        </li>
+      {% endfor %}
+    </div>
+  </div>  
 </div>

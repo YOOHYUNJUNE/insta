@@ -4,6 +4,10 @@ from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
+from .models import Comment
+from django.http import HttpResponseForbidden
+from django.urls import reverse
+
 
 def index(request):
     posts = Post.objects.all().order_by('-id')
@@ -45,6 +49,18 @@ def comment_create(request, post_id):
 
         return redirect('posts:index')
     
+
+@login_required
+def comment_delete(request, post_id, comment_id):   # 댓글작성 유저만 댓글 삭제
+    comment = Comment.objects.get(id=comment_id)
+    
+    if comment.post.user == request.user or comment.user == request.user:    
+        comment.delete()
+        return redirect('posts:index')
+    else:
+        return HttpResponseForbidden("댓글을 삭제할 권한이 없습니다.") # 새 창 띄움
+    
+
 @login_required
 def like(request, post_id):
     # 좋아요 버튼 누른 유저
@@ -80,6 +96,15 @@ def like_async(request, post_id):
         'count': len(post.like_users.all())
     }
     return JsonResponse(context)
+
+
+
+
+
+
+
+
+
 
 
 

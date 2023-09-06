@@ -1,0 +1,10 @@
+
+@ _nav.html
+@ (accounts)/urls.py : path logout (profile보다 위에)	로그아웃 
+@ (accounts)/views.py : def logout	회원가입시 바로 로그인
+@ (posts) / urls.py views.py	업로드 유저와 댓글작성 유저만 댓글 삭제 가능
+@ _card.html	댓글 최신순
+@ (posts)/forms.py	'댓글 남기기'
+
+@ 프로필 페이지에 방명록
+

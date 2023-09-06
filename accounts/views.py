@@ -1,15 +1,17 @@
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.contrib.auth import login as auth_login
-
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+
 
 def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            auth_login(request, user) # 회원가입시 바로 로그인
             return redirect('posts:index')
     else:
         form = CustomUserCreationForm()
@@ -18,7 +20,7 @@ def signup(request):
         'form': form,
     }
 
-    return render(request, 'accounts/form.html', context)
+    return render(request, 'accounts/signup.html', context)
 
 # accounts의 signup.html이 없는데도 signup 페이지가 존재하는 이유
     # settings.py의 TEMPLATES가 모든 파일들을 순회하며 .html파일을 따로 저장,
@@ -40,7 +42,7 @@ def login(request):
         'form': form,
     }
 
-    return render(request, 'accounts/form.html', context)
+    return render(request, 'accounts/login.html', context)
 
 def profile(request, username):
     User = get_user_model()
@@ -69,3 +71,12 @@ def follow(request, username):
         me.followings.add(you)
 
     return redirect('accounts:profile', username=username)
+
+
+
+def logout(request):
+    auth_logout(request)
+    return redirect('accounts:login')
+
+
+

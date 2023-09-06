@@ -6,14 +6,26 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
+
+        {% if user.is_authenticated %}
+        <style>
+                      a {
+                text-decoration: none;
+            }
+        </style>
+        <a href="{% url 'accounts:profile' username=user %}" style="color:coral; font-weight: bold;">나의 profile</a>
+                                                              
+        
         <a class="nav-link" href="{% url 'posts:create' %}">Create</a>
-        <a href="{% url 'accounts:profile' username=user %}">{{user}}</a>
+        <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+        
+        {% else %}
+        
         <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
         <a class="nav-link" href="{% url 'accounts:signup' %}">Signup</a>
 
+        {% endif %}
 
-
-        <!-- <a class="nav-link disabled" aria-disabled="true">{{request.user}}</a> -->
        
       </div>
     </div>
