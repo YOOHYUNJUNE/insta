@@ -1,0 +1,10 @@
+
+
+@ settings.py
+ALLOWED_HOSTS = [
+    '.compute.amazonaws.com',
+]
+
+
+pip freeze > requirements.txt 
+
