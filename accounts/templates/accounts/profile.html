@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bootstrap5 %}
 {% block body %}
 <div class="row">
   <div class="row row-cols-3">
@@ -14,6 +15,11 @@
       <div class="col">팔로워 {{user_info.followers.all|length}}</div>
       <div class="col">팔로잉 {{user_info.followings.all|length}}</div>
     </div>
+    
+    <form action="">
+
+
+    </form>
 
   </div>
   
@@ -31,7 +37,7 @@
   </div>
 </div>
 
-<div class="row row-cols-3">
+<div class="row row-cols-3" >
   {% for post in user_info.post_set.all %}
     <div class="post">
       <div class="card">

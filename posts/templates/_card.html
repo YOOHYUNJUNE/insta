@@ -5,9 +5,13 @@
   <div class="card-header">
     <p>
       <a href="{% url 'accounts:profile' username=post.user %}">
-        <img src="{{post.user.profile_image.url}}" alt="" class="rounded-circle" width="50px">
+        <img src="{{post.user.profile_image.url}}" alt="" class="rounded-circle " width="50px">
       </a>
-      <a href="{% url 'accounts:profile' username=post.user %}" class="text-reset text-decoration-none">{{post.user}}</a>
+      <a href="{% url 'accounts:profile' username=post.user %}" class="text-reset text-decoration-none ">{{post.user}}</a>
+
+      <a href="{% url 'posts:delete' post_id=post.id %}" class="btn btn-secondary " style="width:80px; float:right;">삭제</a>
+      <a href="{% url 'posts:edit' post_id=post.id %}" class="btn btn-warning " style="width:80px; float:right;">수정</a>
+
     </p>
   </div>
 

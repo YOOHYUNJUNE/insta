@@ -6,7 +6,6 @@ from django.http import JsonResponse
 
 from .models import Comment
 from django.http import HttpResponseForbidden
-from django.urls import reverse
 
 
 def index(request):
@@ -36,6 +35,43 @@ def create(request):
 
     return render(request, 'form.html', context)
 
+
+@login_required
+def edit(request, post_id):
+    post = Post.objects.get(id=post_id)
+    if request.user == post.user:
+        context = {
+            'post': post
+        }
+        return render(request, 'edit.html', context)
+    else:
+        return HttpResponseForbidden("권한이 없습니다.")
+    
+
+@login_required
+def update(request, post_id):
+    # new data
+    content = request.POST.get('content')
+
+    # old data
+    post = Post.objects.get(id=post_id)
+    post.content = content
+    post.save()
+    
+    return redirect('posts:index')
+
+@login_required
+def delete(request, post_id):
+    post = Post.objects.get(id=post_id)
+    if post.user == request.user:
+        post.delete()
+        return redirect('posts:index')
+    else:
+        return HttpResponseForbidden("권한이 없습니다.")
+
+
+
+
 @login_required
 def comment_create(request, post_id):
     comment_form = CommentForm(request.POST)
@@ -51,14 +87,14 @@ def comment_create(request, post_id):
     
 
 @login_required
-def comment_delete(request, post_id, comment_id):   # 댓글작성 유저만 댓글 삭제
+def comment_delete(request, post_id, comment_id):   
     comment = Comment.objects.get(id=comment_id)
     
     if comment.post.user == request.user or comment.user == request.user:    
         comment.delete()
         return redirect('posts:index')
     else:
-        return HttpResponseForbidden("댓글을 삭제할 권한이 없습니다.") # 새 창 띄움
+        return HttpResponseForbidden("권한이 없습니다.") # 새 창 띄움
     
 
 @login_required
